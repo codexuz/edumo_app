@@ -12,10 +12,6 @@ public class MainActivity extends BridgeActivity {
         super.onCreate(savedInstanceState);
 
         // Init Bridge
-        this.init(savedInstanceState, new ArrayList<Class<? extends Plugin>>() {
-            {
-                add(GoogleAuth.class);
-            }
-        });
+        this.registerPlugin(GoogleAuth.class);
     }
 }
