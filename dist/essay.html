@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <title>Essay Checker App</title>
+</head>
+<body class="bg-gray-900 font-sans">
+  <div class="max-w-4xl mx-auto p-8 bg-gray-800 sm:shadow-lg sm:rounded-lg mt-10">
+    <h1 class="text-3xl text-blue-600 font-semibold mb-6">Essay Checker</h1>
+
+    <div class="mb-6">
+      <label for="essayQuestion" class="block text-sm font-medium text-gray-400">Essay Question</label>
+      <p id="essayQuestion" class="text-lg mb-2 text-gray-100">Write an essay on the impact of technology on society.</p>
+    </div>
+
+    <div class="mb-6">
+      <label for="essayText" class="block text-sm font-medium text-gray-400">Your Essay</label>
+      <textarea id="essayText" class="w-full bg-gray-700 text-gray-400 p-4 rounded-md border-none focus:outline-none resize-none" rows="5" placeholder="Start typing your essay..."></textarea>
+    </div>
+
+    <div class="mb-6">
+      <label for="timer" class="block text-sm font-medium text-gray-400">Time Remaining</label>
+      <div id="timer" class="text-2xl font-bold text-gray-50">40:00</div>
+    </div>
+
+    <button id="checkButton" class="bg-blue-600 mx-auto w-full sm:w-auto text-white px-4 py-2 rounded-2xl hover:bg-blue-700 focus:outline-none focus:ring focus:border-blue-300">Check Essay</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+  <script>
+    // JavaScript for the countdown timer using moment.js
+    let timerDuration = moment.duration({ minutes: 40 });
+    let timerInterval;
+
+    function updateTimer() {
+      const timerElement = document.getElementById('timer');
+      const timerText = moment.utc(timerDuration.as('milliseconds')).format('mm:ss');
+      timerElement.textContent = timerText;
+    }
+
+    function startTimer() {
+      timerInterval = setInterval(function () {
+        if (timerDuration.as('seconds') <= 0) {
+          clearInterval(timerInterval);
+          // Add any actions to perform when the timer reaches 0
+        } else {
+          timerDuration.subtract(1, 'second');
+          updateTimer();
+        }
+      }, 1000);
+    }
+
+    // Event listener for the check button
+    document.getElementById('checkButton').addEventListener('click', function () {
+      // Add logic to check the essay and provide feedback
+      alert('Essay checked!');
+    });
+
+    // Start the timer when the page loads
+    document.addEventListener('DOMContentLoaded', function () {
+      updateTimer();
+      startTimer();
+      
+      // Auto-adjust textarea height based on content
+      const textarea = document.getElementById('essayText');
+      textarea.addEventListener('input', function () {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
+      });
+    });
+  </script>
+</body>
+</html>
