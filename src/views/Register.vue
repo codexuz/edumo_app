@@ -59,7 +59,9 @@ const doRegister = async()=>{
     <ion-header class="ion-no-border">
       <ion-toolbar color="primary">
         <ion-buttons slot="start">
-        <ion-back-button :icon="chevronBackOutline" default-href="/login"></ion-back-button>
+        <ion-button @click="router.push('/login', 'back')">
+        <ion-icon size="large" :icon="chevronBackOutline"></ion-icon>
+        </ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>

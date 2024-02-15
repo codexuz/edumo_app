@@ -65,6 +65,7 @@ const logOutUser = async()=>{
   .then(() => {
     notLoggin.value = true
     console.log('You sign out')
+    router.push('/home', 'back')
   })
   .catch(error => {
     // Handle sign out error
@@ -129,6 +130,7 @@ const pickImage = async () => {
        <ion-icon :icon="createOutline" slot="start"></ion-icon>Avatarni o'zgartirish</ion-button>
        <h1 class="text-3xl font-bold">{{ username }}</h1>
        <p>Qo'shilgan: {{ joinedAt }}</p>
+       <ion-button @click="logOutUser" siz="large" shape="round" fill="outline" color="danger">Chiqish</ion-button>
      </ion-col>
    </ion-row>
   </ion-grid>

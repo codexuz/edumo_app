@@ -8,29 +8,19 @@ import {  loadingController } from '@ionic/vue';
 import { useRouter } from 'vue-router';
 import { firebaseApp, auth } from '@/firebase'
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged  } from 'firebase/auth';
-import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
 
-onMounted(() => {
-  GoogleAuth.initialize({
-  clientId: '813791000692-6488u36qrqik4gnh0tklsihmmsdqbor5.apps.googleusercontent.com',
-  scopes: ['profile', 'email'],
-  grantOfflineAccess: true,
-  });
-});
 
 const router = useRouter()
 const email = ref('')
 const password = ref('')
 const showToast = ref(false);
 const toastMessage = ref("");
-const isLoading = ref(true)
 
 onAuthStateChanged(auth, (user) => {
   if (user) {
-     router.push('/', 'forward')
+     router.push('/home', 'forward')
   } else {
     console.log('You are not authorized')
-    isLoading.value=false
   }
 });
 
@@ -72,23 +62,23 @@ const doLogin = async () => {
 // Function to handle Google sign-in
 
 const signInWithGoogle = async () => {
-   try {
-        const response = await GoogleAuth.signIn();
+  const provider = new GoogleAuthProvider();
 
-        if (response.id) {
-           router.push('/home', 'forward')
-        }
-      } catch (error) {
-        showToast.value=true;
-        toastMessage.value = error.message;
-   }
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+    console.log(user);
+    router.push('/home', 'forward')
+    // Handle signed-in user
+  } catch (error) {
+    console.error(error);
+    showToast.value=true;
+    toastMessage.value = error;
+  }
 };
-
 </script>
 
 <template>
-<div v-if="isLoading" class="text-center text-lg text-blue-600 mt-5"><ion-spinner name="lines-sharp" color="primary"></ion-spinner></div>
-<div v-else>
   <ion-page>
     <ion-header class="ion-no-border">
       <ion-toolbar color="primary">
@@ -136,5 +126,4 @@ const signInWithGoogle = async () => {
       ></ion-toast>
   </ion-content>
   </ion-page>
-  </div>
 </template>

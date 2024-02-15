@@ -8,6 +8,7 @@ import { db, onAuthStateChange, signOutUser  } from "@/firebase.js";
 import { collection, getDocs } from "firebase/firestore";
 
 const messages = ref([])
+const networkStatus = ref(null)
 
 async function fetchMessages() {
   try {
@@ -35,6 +36,7 @@ import Features from '@/components/Features.vue'
 // Network Status
 networkService.getCurrentStatus().then(status => {
   console.log('Current network status:', status);
+  networkStatus.value = status
 });
 
 
@@ -43,7 +45,6 @@ const setOpen = (open) => (isOpen.value = open)
 
 const router = useRouter();
 
-const isLoading = ref(true)
 const notLoggin = ref(false)
 const username = ref("O'quvchi")
 let profilePicture;
@@ -55,12 +56,9 @@ onAuthStateChange(user => {
      const { uid, displayName, email } = user;
      profilePicture = user.photoURL
      username.value = displayName;
-     isLoading.value = false
 
   } else {
     console.log('You are not authorized')
-    isLoading.value = false
-    notLoggin.value = true
   }
 });
 })
@@ -82,7 +80,7 @@ const logOutUser = async()=>{
 </script>
 
 <template>
-  <ion-page v-if="!isLoading">
+  <ion-page>
     <ion-header class="ion-no-border">
      <ion-toolbar color="primary" class="flex items-center ion-padding-vertical">
     <img slot="start" class="w-10 mx-2 rounded-full" alt="Avatar" :src="profilePicture || 'https://www.shutterstock.com/image-vector/vector-flat-illustration-grayscale-avatar-600nw-2264922221.jpg'" />
@@ -106,7 +104,8 @@ const logOutUser = async()=>{
         <Authorize v-if="notLoggin"/>
         <div v-else class="container bg-blue-50/20 rounded-xl p-3 text-center mx-auto px-4 flex items-center gap-3"
         v-for="message in messages" :key="message.id">
-        <router-link class="flex items-center gap-3" :to="`/messages/${message.id}`">
+        <div v-if="!networkStatus">No network</div>
+        <router-link v-else class="flex items-center gap-3" :to="`/messages/${message.id}`">
          <ion-icon class="w-6 h-8 text-blue-500/60 bg-blue-50 py-1 px-2 rounded-full" :icon="chatboxEllipses"></ion-icon>
          <div class="text-left">
          <p class="text-2xl font-bold text-gray-700">{{ message.title}}</p>
@@ -128,5 +127,4 @@ const logOutUser = async()=>{
     </ion-grid>
     </ion-content>
   </ion-page>
-  <div v-else class="text-center text-lg text-blue-600 mt-5"><ion-spinner name="lines-sharp" color="primary"></ion-spinner></div>
 </template>
