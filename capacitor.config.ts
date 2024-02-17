@@ -37,7 +37,7 @@ const config: CapacitorConfig = {
   },
   android: {
     splash: {
-      image: "resources/android/splash/icon.png",
+      image: "resources/splash.png",
       backgroundColor: "#ffffff",
       resizeMode: "cover"
     }
