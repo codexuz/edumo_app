@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<resources>
-    <string name="app_name">ExamOnline Edumo</string>
-    <string name="title_activity_main">ExamOnline Edumo</string>
-    <string name="package_name">vercel.multiexam.app</string>
-    <string name="custom_url_scheme">vercel.multiexam.app</string>
-</resources>
