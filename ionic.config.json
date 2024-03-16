@@ -1,0 +1,8 @@
+{
+  "name": "Edumo Academy",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite",
+  "id": "3f362fb1"
+}
