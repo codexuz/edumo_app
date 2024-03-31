@@ -1,9 +1,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import LoginIcon from '../assets/login.svg'
-import { logInOutline, eyeOutline, eyeOffOutline, logoGoogle } from 'ionicons/icons';
-import { personCircleOutline, chevronBackOutline,
- mailOutline, lockClosedOutline } from 'ionicons/icons';
+import sms from '@/assets/sms.png'
+import Lock from '@/assets/Lock.png'
+import Logo from '@/assets/logo.png'
+import GoogleIcon from '@/assets/GoogleIcon.png'
 import {  loadingController } from '@ionic/vue';
 import { useRouter } from 'vue-router';
 import { firebaseApp } from '@/firebase'
@@ -21,7 +21,7 @@ const toastMessage = ref("");
 onMounted(()=>{
   const user = useCurrentUser()
   if (user) {
-     router.push('/home', 'forward')
+     //router.push('/home', 'forward')
   } else {
     console.log('You are not authorized')
   }
@@ -70,9 +70,9 @@ onMounted(()=>{
 <template>
   <ion-page>
     <ion-header class="ion-no-border">
-      <ion-toolbar color="primary">
+      <ion-toolbar color="light">
        <ion-buttons slot="start">
-        <ion-back-button default-href="/"></ion-back-button>
+        <ion-back-button default-href="/home"></ion-back-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
@@ -80,36 +80,40 @@ onMounted(()=>{
     <ion-grid>
       <ion-row class="ion-justify-content-center">
          <ion-col size="12" size-md="8" size-lg="6" size-xl="4">
-      <div class="mx-auto">
-        <img :src="LoginIcon" class="w-[40%] sm:w-32 mx-auto" alt="Logo"/>
-        <div class="text-center">
-        <h1 class="text-3xl text-blue-600 text-center font-bold ">Platformaga kirish</h1>
-        <p class="text-gray-400">Ma'lumotlatingizni kiriting</p>
-        </div>
+      <div class="mx-auto mt-4">
+        <img :src="Logo" class="sm:w-32 mx-auto" alt="Logo"/>
+        <p class="text-center my-2"><small>Powered by <span class=" text-blue-600 font-bold">EDUMO</span></small></p>
       </div>
-      <ion-item class="relative flex items-end">
-        <ion-label position="floating">Email</ion-label>
-        <ion-icon :icon="mailOutline" slot="start"></ion-icon>
-        <ion-input type="email" v-model="email"></ion-input>
-      </ion-item>
-      <ion-item class="relative flex items-end">
-        <ion-label position="floating">Parol</ion-label>
-        <ion-icon :icon="lockClosedOutline" slot="start"></ion-icon>
-        <ion-input v-model="password" :type="showPassword ? 'text' : 'password'"></ion-input>
-        <ion-icon  :icon="showPassword ? eyeOffOutline : eyeOutline" @click="togglePasswordVisibility" slot="end"></ion-icon>
-      </ion-item>
-      <ion-button  @click="doLogin" class="ion-margin-top" expand="block">Kirish
-        <ion-icon :icon="logInOutline" slot="end"></ion-icon>
-      </ion-button>
-      <p class="text-gray-700 text-center mt-6">Hisob yaratmaganmisiz? <span class="text-sky-400"><router-link to="/register">Ro'yxatdan o'tish</router-link></span></p>
+      <form class="flex flex-col gap-2 mt-3"  @submit.prevent="doLogin">
+       <div class="flex items-center gap-x-3 border-2 border-[#2563EB] h-[48px] rounded-xl placeholder-[#2E2E2E] text-[#2E2E2E] px-3 font-medium">
+          <img :src="sms">
+          <input type="email" required v-model="email" class="w-full border-none outline-none" placeholder="Email"/>
+       </div>
+       <div class="flex items-center gap-x-3 border-2 border-[#2563EB] h-[48px] rounded-xl placeholder-[#2E2E2E] text-[#2E2E2E] px-3 font-medium">
+          <img :src="Lock">
+          <input type="password" required v-model="password" class="w-full border-none outline-none" placeholder="Parol" autocomplete="true">
+       </div>
+       <div class="flex flex-col items-center">
+          <button class="py-3 rounded-xl bg-[#2563EB] px-4 text-white w-full">Kirish</button>
+       </div>
+      <p class="text-gray-700 text-center mt-6"><b>Parolni unutdingizmi?</b> <span class="text-[#2563EB]text-sm"><router-link to="#">Parolni tiklash</router-link></span></p>
+      <div class="flex items-center gap-x-2 mt-1">
+        <div class="border-b border-[#F3F3F5] w-full"></div><span class="text-[#BEC1C4]">YOKI</span><div class="border-b border-[#F3F3F5] w-full"></div>
+      </div>
+    </form>
+    <div class="flex flex-col items-center mt-3">
+          <button class="py-3 rounded-xl bg-[#E3EDFF] flex items-center justify-center gap-x-2 px-4 text-white w-full text-[#263038]">
+            <img :src="GoogleIcon"/>
+             Google orqali kirish
+          </button>
+       </div>
       </ion-col>
       </ion-row>
     </ion-grid>
-     <ion-toast
-        :is-open="showToast"
-        :message="toastMessage"
-        :duration="2000"
-      ></ion-toast>
+    <div class="w-full absolute bottom-10 flex items-center5 justify-center">
+       <p class="text-[#515960]">Hisobingiz yo'qmi? <span class="font-medium text-[#2563EB]"><router-link to="/register">Ro'yxatdan o'tish</router-link></span></p>
+    </div>
+   
   </ion-content>
   </ion-page>
 </template>
