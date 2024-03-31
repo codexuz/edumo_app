@@ -1,10 +1,13 @@
 <script setup>
 import { ref } from 'vue'
-import AuthIcon from '../assets/auth.svg'
-import { personCircleOutline, personOutline, chevronBackOutline, mailOutline, lockClosedOutline } from 'ionicons/icons';
 import { register, updateUserProfile } from "@/firebase.js";
 import {  loadingController } from '@ionic/vue';
 import { useRouter } from 'vue-router';
+import User from '@/assets/User.png'
+import sms from '@/assets/sms.png'
+import Lock from '@/assets/Lock.png'
+import Logo from '@/assets/logo.png'
+
 
 const router = useRouter()
 const showToast = ref(false);
@@ -51,47 +54,41 @@ const doRegister = async () => {
 <template>
   <ion-page>
     <ion-header class="ion-no-border">
-      <ion-toolbar color="primary">
-        <ion-buttons slot="start">
-        <ion-back-button default-href="/login">
-        </ion-back-button>
-        </ion-buttons>
+      <ion-toolbar color="light">
       </ion-toolbar>
     </ion-header>
     <ion-content class="ion-padding ion-margin-top" scroll-y="false">
     <ion-grid>
       <ion-row class="ion-justify-content-center">
          <ion-col size="12" size-md="8" size-lg="6" size-xl="4">
-      <div class="mx-auto">
-        <img :src="AuthIcon" class="w-[40%] sm:w-32 mx-auto" alt="Logo"/>
-        
+      <div class="mx-auto mt-4">
+        <img :src="Logo" class="sm:w-32 mx-auto" alt="Logo"/>
+        <h1 class="font-bold text-2xl text-center mb-3">Welcome to SpeakUp!</h1>
       </div>
-      <ion-item class="relative flex items-end">
-        <ion-label position="floating">Ism</ion-label>
-        <ion-icon :icon="personOutline" slot="start"></ion-icon>
-        <ion-input  v-model="name"></ion-input>
-      </ion-item>
-      <ion-item class="relative flex items-end">
-        <ion-label position="floating">Email</ion-label>
-        <ion-icon :icon="mailOutline" slot="start"></ion-icon>
-        <ion-input type="email" v-model="email"></ion-input>
-      </ion-item>
-      <ion-item class="relative flex items-end">
-        <ion-label position="floating">Parol</ion-label>
-        <ion-icon :icon="lockClosedOutline" slot="start"></ion-icon>
-        <ion-input v-model="password" type="password"></ion-input>
-      </ion-item>
-      <ion-button  @click="doRegister" class="ion-margin-top" expand="block">Hisob yaratish
-        <ion-icon :icon="personCircleOutline" slot="end"></ion-icon>
-      </ion-button>
+      <form class="flex flex-col gap-2 mt-5"  @submit.prevent="doLogin">
+        <div class="flex items-center gap-x-3 border-2 border-[#2563EB] h-[48px] rounded-xl placeholder-[#2E2E2E] text-[#2E2E2E] px-3 font-medium">
+          <img :src="User">
+          <input type="text" required v-model="name" class="w-full border-none outline-none" placeholder="F.I.O"/>
+       </div>
+       <div class="flex items-center gap-x-3 border-2 border-[#2563EB] h-[48px] rounded-xl placeholder-[#2E2E2E] text-[#2E2E2E] px-3 font-medium">
+          <img :src="sms">
+          <input type="email" required v-model="email" class="w-full border-none outline-none" placeholder="Email"/>
+       </div>
+       <div class="flex items-center gap-x-3 border-2 border-[#2563EB] h-[48px] rounded-xl placeholder-[#2E2E2E] text-[#2E2E2E] px-3 font-medium">
+          <img :src="Lock">
+          <input type="password" required v-model="password" class="w-full border-none outline-none" placeholder="Parol" autocomplete="true">
+       </div>
+       <div class="flex flex-col items-center">
+          <button class="py-3 rounded-xl bg-[#2563EB] px-4 text-white w-full">Kirish</button>
+       </div>   
+    </form>
       </ion-col>
       </ion-row>
     </ion-grid>
-     <ion-toast
-        :is-open="showToast"
-        :message="toastMessage"
-        :duration="2000"
-      ></ion-toast>
+    <div class="w-full absolute bottom-10 flex items-center5 justify-center">
+       <p class="text-[#515960] font-bold">Hisobingiz bormi? <span class="font-medium text-[#2563EB]"><router-link to="/login">Kirish</router-link></span></p>
+    </div>
+   
   </ion-content>
   </ion-page>
 </template>
