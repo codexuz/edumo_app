@@ -234,4 +234,13 @@ html {
   /* For more information on dynamic font scaling, visit the documentation: 
   https://ionicframework.com/docs/layout/dynamic-font-scaling */
   --ion-dynamic-font: var(--ion-default-dynamic-font);
+  --ion-font-family: 'Poppins';
 }
+
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: normal;
+  src: url('../assets/fonts//Poppins-Regular.ttf');
+}
+
