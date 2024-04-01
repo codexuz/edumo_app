@@ -122,7 +122,7 @@ async function getDictionary(word){
     </ion-content>
     <ion-footer class="ion-no-border">
     <ion-toolbar color="light">
-      <div v-show="isShown" class="w-full flex flex-col justify-center items-start px-5  py-3 bg-rose-300/30 sm:w-[400px] mx-auto rounded-t-xl">
+      <div v-show="isShown" class="flex flex-col justify-center items-start px-5  py-3 bg-rose-300/30 sm:w-[400px] mx-auto rounded-t-xl">
         <div class="mx-3">
           <h3 class="text-rose-600 text-2xl">Xato!</h3>
           <p class="text-rose-600 text-sm font-bold mb-3">
@@ -134,7 +134,7 @@ async function getDictionary(word){
         </div>
         <button class=" w-[80%] sm:w-[300px] mx-auto px-8 text-xl text-white btn btn-error  rounded-2xl">Davom etish</button>
       </div>
-      <div v-show="false" class="w-full flex flex-col justify-center items-start px-5  py-3 bg-emerald-300/30 sm:w-[400px] mx-auto rounded-t-xl">
+      <div v-show="false" class="flex flex-col justify-center items-start px-5  py-3 bg-emerald-300/30 sm:w-[400px] mx-auto rounded-t-xl">
         <div class="mx-3">
           <h3 class="text-emerald-600 text-2xl">To'g'ri!</h3>
         </div>

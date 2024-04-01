@@ -2,8 +2,12 @@
 import { ref } from 'vue'
 import { logOutOutline, personCircle, shareSocialOutline, chatbubblesOutline, powerOutline } from 'ionicons/icons';
 import { RouterLink, useRouter, RouterView } from 'vue-router'
-import { signOutUser } from "@/firebase.js";
 import { Share } from '@capacitor/share';
+import { supabase } from '@/supabase'
+import {  toastController, loadingController } from '@ionic/vue';
+import { Dialog } from '@capacitor/dialog';
+
+
 
 const notLoggin = ref(false)
 
@@ -11,17 +15,39 @@ const router = useRouter()
 
 
 
-const logOutUser = async () => {
-  try {
-    await signOutUser();
-    router.push('/home', 'back')
-     notLoggin.value = true
-    console.log("User signed out successfully");
-  } catch (error) {
-    console.error("Error signing out:", error);
-    // Handle error gracefully, such as displaying an error message to the user
+const confirmExit = async () => {
+  const { value } = await Dialog.confirm({
+    title: 'Chiqish',
+    message: `Hisobingizdan chiqmoqchimisiz?`,
+  });
+
+  if(!value){
+    return
   }
+
+  logOutUser()
 };
+
+
+const logOutUser = async () => {
+  const toast = await toastController.create({ duration: 2500 })
+  
+  try{
+    const { error } = await supabase.auth.signOut()
+    if(error){
+      toast.message = error
+      await toast.present()
+      return
+    }
+    router.push('/login', 'back')
+  }
+  catch(error){
+   toast.message = error.error_description || error.message
+   await toast.present()
+  }
+  
+
+}
 
 
 async function shareApp(){
@@ -73,7 +99,7 @@ async function shareApp(){
       </ion-item>
     </ion-list>
     <ion-list :inset="true">
-        <ion-item @click="logOutUser" color="danger" class="rounded-2xl mx-6">
+        <ion-item @click="confirmExit" color="danger" class="rounded-2xl mx-6">
           <ion-icon :icon="powerOutline" slot="start"></ion-icon>
           Chiqish
         </ion-item>

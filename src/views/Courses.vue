@@ -2,25 +2,62 @@
 import { ref, onMounted } from 'vue'
 import { RouterLink, useRouter, RouterView } from 'vue-router'
 import { networkService  } from '@/lib/networkService.js';
-import { logOutOutline, settingsOutline, chatboxEllipses, notificationsOutline } from 'ionicons/icons';
-import { db, onAuthStateChange, signOutUser  } from "@/firebase.js";
+import { star, videocam, settingsOutline, chatboxEllipses, notificationsOutline } from 'ionicons/icons';
 import Authorize from '@/components/Authorize.vue'
-import { collection, getDocs } from "firebase/firestore";
-const courses = ref([])
+import Cap from '@/assets/cap.png'
 
-onMounted(async()=>{
+const courses = ref([
+  {
+    id: 1,
+    title: 'Writing Task 2',
+    fee: 'Free',
+    desc: '',
+    author:'Sarvar Khatamov',
+    lessons: 12,
+    liked: 200,
+    level: 'Intermediate',
+    star: 5,
+    progress: '0.1'
+  },
+  {
+    id: 2,
+    title: 'Writing Task 1',
+    fee: 'Free',
+    desc: '',
+    author:'Teacher Muzaffar',
+    lessons: 12,
+    level: 'Pre-Intermediate',
+    star: 3,
+    progress: '0.7'
 
-  const querySnapshot = await getDocs(collection(db, "task1"));
-querySnapshot.forEach((doc) => {
-  // doc.data() is never undefined for query doc snapshots
-  const courseData = doc.data();
-  courseData.id = doc.id; 
-  courses.value.push(courseData);
- console.log(courses.value);
+  },
+  {
+    id: 3,
+    title: 'Speaking',
+    fee: 'Free',
+    desc: '',
+    author:'Kubayev Javlon',
+    lessons: 12,
+    level: 'Pre-Intermediate',
+    star: 4.5,
+    progress: '0.4'
+  },
+  {
+    id: 4,
+    title: 'Reading',
+    fee: 'Free',
+    desc: '',
+    author:'Alisher Sadullayev',
+    lessons: 12,
+    level:'Elementary',
+    star: 3.4,
+    courseBase:[
+      {id: 1, title: 'Part 1', video: '', pdf: ''}
+    ]
+  }
+])
 
-});
-
-})
+console.log(courses)
 
 
 //Network Status
@@ -29,28 +66,10 @@ networkService.getCurrentStatus().then(status => {
 });
 
 
-const isOpen = ref(false);
-const setOpen = (open) => (isOpen.value = open)
 
 const router = useRouter();
 
-const isLoading = ref(true)
-const username = ref("O'quvchi")
-let profilePicture;
 
-// Example usage of onAuthStateChanged
-onAuthStateChange(user => {
-  if (user) {
-     const { uid, displayName, email } = user;
-     profilePicture = user.photoURL
-     username.value = displayName;
-     isLoading.value = false
-
-  } else {
-    console.log('You are not authorized')
-    isLoading.value = false
-  }
-});
 
 
 </script>
@@ -63,13 +82,27 @@ onAuthStateChange(user => {
   </ion-toolbar>
   </ion-header>
   <ion-content scroll-y="true">
-   <div class="mt-4 grid grid-cols-1 sm:grid-cols-3">
+   <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-2">
   <router-link v-for="course in courses" :to="`/course/${course.id}`" :key="course.id">
-    <ion-card class="shadow-sm bg-sky-200/40 border border-sky-100/40 ">
-      <ion-card-header>
-        <ion-card-title>{{ course.title }}</ion-card-title>
-        <ion-card-subtitle>{{ course.subtitle }}</ion-card-subtitle>
-      </ion-card-header>
+    <ion-card class="shadow-sm border border-gray-200/30 rounded-2xl">
+    <ion-card-content>
+      <div class="flex items-center gap-x-4">
+        <div class="bg-gradient-to-r from-[#00CFE8] to-[#1CE7FF] p-2 rounded-xl">
+          <img :src="Cap"/>
+        </div>
+        
+        <div class="flex flex-col items center">
+          <ion-card-title>{{ course.title }}</ion-card-title>
+          <ion-card-subtitle>{{ course.author }}</ion-card-subtitle>
+          <div class="flex items-center gap-x-2">
+           <span class="flex items-center justify-center"><ion-icon slot="start" :icon="star" color="warning"></ion-icon> {{ course.star }}</span> 
+            <p class="text-sm text-gray-400"><small>{{ course.author }}</small></p>
+            <p><small>{{ course.level }}</small></p>
+          </div>
+          <ion-progress-bar class="rounded-full py-1 my-2" :value="course.progress"></ion-progress-bar>
+        </div>
+      </div>
+    </ion-card-content>
     </ion-card>
   </router-link>
    </div>

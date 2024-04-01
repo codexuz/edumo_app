@@ -1,51 +1,67 @@
 <script setup>
 import { ref } from 'vue'
-import { register, updateUserProfile } from "@/firebase.js";
-import {  loadingController } from '@ionic/vue';
+import AuthIcon from '../assets/auth.svg'
+import {  loadingController, toastController } from '@ionic/vue';
 import { useRouter } from 'vue-router';
-import User from '@/assets/User.png'
+import { supabase } from '@/supabase'
 import sms from '@/assets/sms.png'
 import Lock from '@/assets/Lock.png'
 import Logo from '@/assets/logo.png'
+import GoogleIcon from '@/assets/GoogleIcon.png'
 
 
 const router = useRouter()
-const showToast = ref(false);
-const toastMessage = ref("");
 const name = ref('')
 const email = ref('')
 const password = ref('')
 
   
 const doRegister = async () => {
+        
+  const toast = await toastController.create({ duration: 2500 })
+  const loading = await loadingController.create({
+                  message: 'Hisob yaratilmoqda...',
+        });
+
   if (!email.value || !password.value || !name.value) {
-    showToast.value = true;
-    toastMessage.value = "Barcha maydonlarni to'ldirish shart";
+    toast.message = 'Barcha maydonlar to\'ldirilishi shart!'
+    await toast.present()
     return;
   }
 
-  const loading = await loadingController.create({
-    message: 'Hisob yaratilmoqda...',
-  });
-  loading.present();
-
   try {
-    const userCredential = await register(email.value, password.value);
-    const user = userCredential.user;
+    
+    loading.present();
 
-    if (user) {
-      await updateUserProfile(name.value, 'https://www.shutterstock.com/image-vector/vector-flat-illustration-grayscale-avatar-600nw-2264922221.jpg');
-      router.push('/home');
-    }
+    const { user , error } = await supabase.auth.signUp({
+      email: email.value,
+      password: password.value,
+      options: {
+      data: {
+      full_name: name.value,
+      avatar_url: 'https://avatar.iran.liara.run/public/boy?username=Ash'
+          },
+       },
+    })
 
-    loading.dismiss();
+    if (error) {
+      console.error('Error registering user:', error.message);
+      toast.message = error.message
+      await toast.present()
+      return; // Exit early if there's an error
+        } 
+
+        router.push('/home', 'forward')
+    
+
   } catch (error) {
-    loading.dismiss();
-    const errorMessage = error.message || "Xatolik yuz berdi";
-    showToast.value = true;
-    toastMessage.value = errorMessage;
-    console.error(error);
+    toast.message = error.error_description || error.message
+    await toast.present()
+  } finally {
+    await loading.dismiss()
   }
+
+  
 };
 
 
@@ -79,14 +95,14 @@ const doRegister = async () => {
           <input type="password" required v-model="password" class="w-full border-none outline-none" placeholder="Parol" autocomplete="true">
        </div>
        <div class="flex flex-col items-center">
-          <button class="py-3 rounded-xl bg-[#2563EB] px-4 text-white w-full">Kirish</button>
+          <button class="py-3 rounded-xl bg-[#2563EB] px-4 text-white w-full">Hisob yaratish</button>
        </div>   
     </form>
       </ion-col>
       </ion-row>
     </ion-grid>
     <div class="w-full absolute bottom-10 flex items-center5 justify-center">
-       <p class="text-[#515960] font-bold">Hisobingiz bormi? <span class="font-medium text-[#2563EB]"><router-link to="/login">Kirish</router-link></span></p>
+       <p class="text-[#515960]">Hisobingiz bormi? <span class="font-medium text-[#2563EB]"><router-link to="/login">Kirish</router-link></span></p>
     </div>
    
   </ion-content>

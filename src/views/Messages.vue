@@ -1,8 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { getDoc, doc } from 'firebase/firestore';
 import { useRoute } from 'vue-router';
-import { db } from '@/firebase'; // Import your Firebase setup here
 import { networkService } from '@/lib/networkService.js'; // Import your network service
 import { chevronBackOutline } from 'ionicons/icons'
 import Offline from '@/components/Offline.vue'
@@ -24,23 +22,9 @@ onMounted(async () => {
     loading.value = false; // Stop loading if no network
     return; // Don't fetch message if no network
   }
+})
 
-  const messageId = route.params.id;
-  // Fetch the message details by ID
-  try {
-    const messageDoc = await getDoc(doc(db, 'messages', messageId));
-    if (messageDoc.exists()) {
-      message.value = messageDoc.data();
-    } else {
-      console.error('Message not found');
-    }
-  } catch (error) {
-    console.error('Error fetching message:', error);
-    // Handle error
-  } finally {
-    loading.value = false;
-  }
-});
+
 </script>
 
 <template>

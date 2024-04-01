@@ -1,0 +1,69 @@
+{
+    "test_name": "Daraja testi",
+    "questions": [
+      {
+        "id": 1,
+        "type": "audio",
+        "audio_url": "https://example.com/audio1.mp3",
+        "question_text": "Listen to the audio and choose the correct option:",
+        "sentence": "My office is on the ....... floor",
+        "options": [
+          {"option": "A", "text": "6th"},
+          {"option": "B", "text": "5th"},
+          {"option": "C", "text": "15th"}
+        ],
+        "correct_answer": "A"
+      },
+      {
+        "id": 2,
+        "type": "grammar",
+        "question_text": "Choose the correct verb form to complete the sentence:",
+        "sentence": "I ____ to the store yesterday.",
+        "options": [
+          {"option": "A", "text": "go"},
+          {"option": "B", "text": "went"},
+          {"option": "C", "text": "going"}
+        ],
+        "correct_answer": "B"
+      },
+      {
+        "id": 3,
+        "type": "audio",
+        "audio_url": "https://example.com/audio2.mp3",
+        "question_text": "Listen to the audio and choose the correct option:",
+        "sentence": "My birthday is on the ..... of September",
+        "question_audio": "https://example.com/question_audio.mp3",
+        "options": [
+          {"option": "A", "text": "25th"},
+          {"option": "B", "text": "15th"},
+          {"option": "C", "text": "29th"}
+        ],
+        "correct_answer": "B"
+      },
+      {
+        "id": 4,
+        "type": "reading",
+        "question_text": "For each question, choose the correct answer.",
+        "passage": "Hi Jim,\n Can you meet me at 2 pm today? I’ll be in Classroom B at that time. \nThanks, \nSarah",
+        "options": [
+          {"option": "A", "text": "Sarah’s class starts at 2 pm."},
+          {"option": "B", "text": "Sarah wants to meet Jim this afternoon."},
+          {"option": "C", "text": "Jim’s teaching in Classroom B today."}
+        ],
+        "correct_answer": "B"
+      },
+      {
+        "id": 5,
+        "type": "grammar",
+        "question_text": "Choose the correct verb form to complete the sentence:",
+        "sentence": "Wiwi's been a vegetarian _____ three years",
+        "options": [
+            {"option": "A", "text": "since"},
+            {"option": "B", "text": "for"},
+            {"option": "C", "text": "after"}
+          ],
+          "correct_answer": "B"
+      }
+    ]
+  }
+  

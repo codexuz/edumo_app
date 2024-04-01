@@ -3,52 +3,16 @@ import Tabs from '@/components/Tabs.vue';
 
 const routes = [
   {
+    path:'/generate',
+    component: ()=> import('@/views/writing/Generator.vue')
+   },
+  {
    path:'/login',
    component: ()=> import('@/views/Login.vue')
   },
   {
     path:'/register',
     component: ()=> import('@/views/Register.vue')
-  },
-  {
-   path:'/part-1/apps',
-   component: ()=> import('@/views/sample/Apps.vue')
-  },
-  {
-   path:'/part-1/ads',
-   component: ()=> import('@/views/sample/Ads.vue')
-  },
-  {
-   path:'/part-1/art',
-   component: ()=> import('@/views/sample/Art.vue')
-  },
-  {
-   path:'/part-1/bags',
-   component: ()=> import('@/views/sample/Bags.vue')
-  },
-  {
-   path:'/part-1/cycle',
-   component: ()=> import('@/views/sample/Bicycle.vue')
-  },
-  {
-   path:'/part-1/books',
-   component: ()=> import('@/views/sample/Books.vue')
-  },
-  {
-   path:'/part-1/buildings',
-   component: ()=> import('@/views/sample/Buildings.vue')
-  },
-  {
-   path:'/part-1/cakes',
-   component: ()=> import('@/views/sample/Cakes.vue')
-  },
-  {
-   path:'/part-1/cinema',
-   component: ()=> import('@/views/sample/Cinema.vue')
-  },
-  {
-    path: '/messages/:id',
-    component: ()=> import('@/views/Messages.vue')
   },
   {
     path: '/mock-tests/:id',
@@ -59,8 +23,16 @@ const routes = [
     component: ()=> import('@/views/Speaking.vue')
   },
   {
+    path: '/words/learn',
+    component: ()=> import('@/views/words_game/Learn.vue')
+  },
+  {
+    path: '/listening:id',
+    component: ()=> import('@/views/listening/Test.vue')
+  },
+  {
     path: '/listening',
-    component: ()=> import('@/views/Listening.vue')
+    component: ()=> import('@/views/listening/Test1.vue')
   },
   {
     path: '/writing',
@@ -83,7 +55,11 @@ const routes = [
     component: () => import('@/views/Chat.vue'),
   },
   {
-    path: '',
+    path: '/',
+    redirect: '/home',
+  },
+  {
+    path: '/',
     component: Tabs,
     children: [
       {
@@ -105,7 +81,11 @@ const routes = [
       {
         path: 'result',
         component: () => import('@/views/Result.vue'),
-      }
+      },
+      {
+        path: 'universities',
+        component: () => import('@/views/University.vue')
+      },
     ],
   },
 ];

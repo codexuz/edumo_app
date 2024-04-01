@@ -1,6 +1,6 @@
 <script setup>
 
-import { person, home, school, statsChart } from 'ionicons/icons';
+import { person, home, school, diamondOutline, statsChart, bookmarks } from 'ionicons/icons';
 
 </script>
 
@@ -22,6 +22,11 @@ import { person, home, school, statsChart } from 'ionicons/icons';
         <ion-tab-button tab="result" href="/result">
           <ion-icon :icon="statsChart" />
           <ion-label>Natijalarim</ion-label>
+        </ion-tab-button> 
+        
+        <ion-tab-button tab="universities" href="/universities">
+          <ion-icon :icon="bookmarks" />
+          <ion-label>OTMlar</ion-label>
         </ion-tab-button>
 
         <ion-tab-button tab="profile" href="/profile">

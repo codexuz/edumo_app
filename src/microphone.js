@@ -32,7 +32,7 @@ export async function startRecording() {
   }
 
 
-
+const date = new Date().getTime()
  
 
 export async function stopRecording() {
@@ -45,7 +45,7 @@ export async function stopRecording() {
         const base64 = `data:${mimeType};base64,${base64Sound}`
      
         // Save audio file to the app's data directory
-        const fileName = 'recorded_audio.mp3'; // Change the file name as needed
+        const fileName = `${date}_audio.mp3`; // Change the file name as needed
         const savedFile = await Filesystem.writeFile({
             path: fileName,
             data: base64,

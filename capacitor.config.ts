@@ -7,6 +7,14 @@ const config: CapacitorConfig = {
   bundledWebRuntime: false,
   cordova: {},
   plugins: {
+    GoogleAuth: {
+      scopes: ['profile', 'email'],
+      serverClientId: '286062618284-cpte93ftno07vvadmfo3tr3617i1tj0j.apps.googleusercontent.com',
+      forceCodeForRefreshToken: true,
+    },
+    CapacitorHttp: {
+      enabled: true,
+    },
     SplashScreen: {
       launchShowDuration: 3000,
       launchAutoHide: true,

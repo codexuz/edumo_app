@@ -1,9 +1,12 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router';
-import { VueFire, VueFireAuth  } from 'vuefire'
-import { firebaseApp } from '@/firebase'
 import { IonicVue } from '@ionic/vue';
+import '../node_modules/flowbite-vue/dist/index.css'
+import { AVPlugin } from "vue-audio-visual";
+
+
+
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/vue/css/core.css';
@@ -27,6 +30,7 @@ import './theme/variables.css';
 
 // Import Ionic-Vue components
 import {
+  IonTextarea,
   IonButton,
   IonContent,
   IonHeader,
@@ -62,23 +66,29 @@ import {
   IonSpinner,
   IonToggle,
   IonList,
-  IonListHeader
+  IonListHeader,
+  IonItemOption,
+  IonItemOptions,
+  IonBadge,
+  IonFooter
 } from '@ionic/vue';
+
+import { use } from 'marked';
 
 
 const app = createApp(App)
   .use(IonicVue)
   .use(router)
-  .use(VueFire, {
-    // imported above but could also just be created here
-    firebaseApp,
-    modules: [
-          VueFireAuth(),
-          ],
-  })
+  .use(AVPlugin)
+ 
   
 
   // Register Ionic-Vue components globally
+app.component('ion-textarea', IonTextarea)
+app.component('ion-footer', IonFooter)
+app.component('ion-badge', IonBadge)
+app.component('ion-option', IonItemOption)
+app.component('ion-options', IonItemOptions)
 app.component('ion-list', IonList)
 app.component('ion-list-header', IonListHeader)
 app.component('ion-spinner', IonSpinner)
@@ -86,7 +96,7 @@ app.component('ion-app', IonApp)
 app.component('ion-router-outlet', IonRouterOutlet)
 app.component('ion-modal', IonModal)
 app.component('ion-avatar', IonAvatar)
-app.component('ion-search-bar', IonSearchbar)
+app.component('ion-searchbar', IonSearchbar)
 app.component('ion-tabs', IonTabs)
 app.component('ion-tab-bar', IonTabBar) 
 app.component('ion-tab-button', IonTabButton)

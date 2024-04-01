@@ -1,54 +1,138 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import {auth} from '@/firebase.js'
-import { updateProfile, updatePassword  } from "firebase/auth";
 import { RouterLink, useRouter, RouterView } from 'vue-router'
 import { arrowBackOutline } from 'ionicons/icons';
-import {  loadingController } from '@ionic/vue';
+import {  loadingController, toastController } from '@ionic/vue';
+import { supabase } from '@/supabase'
 
 const router = useRouter()
 const name = ref(null)
 const email = ref(null)
 const newPassword = ref(null)
-const currentUser = auth.currentUser;
+const studentId = ref(null)
 
-const user = auth.currentUser;
-if (user !== null) {
-  name.value = user.displayName;
-  email.value = user.email;
+let toast;
+let loading;
+
+const getUser = async () => {
+  const { data} = await supabase.auth.getUser()
+  if(!data){
+    console.log('Tizimga kiring')
+    return
+  }
+
+  studentId.value = data.user.id
+  getProfile()
 }
 
-const updateNewPassword = async () => {
-  if (!currentUser) {
-    return;
-  }
-let loading = await loadingController.create({
-  message: 'Saqlanmoqda...',
-});
-loading.present();
+onMounted(getUser)
 
-  updatePassword(currentUser, newPassword.value).then(() => {
-   loading.dismiss()
-   }).catch((error) => {
-   loading.dismiss()
-   alert('Xatolik sodir bo\'ldi!')
-});
-};
 
-async function profileUpdate(){
-      try {
-        updateNewPassword()
-        await updateProfile(currentUser, {
-          displayName: name.value
-        });
-        console.log("Profile updated successfully!");
-      } catch (error) {
-        console.error("Error updating profile:", error.message);
+async function getProfile(){
+
+try {
+
+  const { data, error } = await supabase
+          .from('students')
+          .select(`*`)
+          .eq('id', studentId.value)
+          .single()
+
+      if(data){
+        //console.log(data)
+        name.value = data.display_name
+        email.value = data.email
+        
       }
+
+}
+catch(error){
+   console.log(error)
+}
+
+}
+
+
+async function updateUserEmailandPassword(){
+  toast = await toastController.create({ duration: 2500 })
+  loading = await loadingController.create({});
+ 
+  if(!newPassword.value){
+      toast.message = "Maydon bo'sh qolishi mumkin emas"
+      await toast.present()
+      return
+    }
+
+  try {
+      loading.present()
+      const { data, error } = await supabase.auth.updateUser({
+      password: newPassword.value,
+    })
+
+    if(error){
+      toast.message = error.message
+      await toast.present()
+      loading.dismiss()
+      return
+    }
+
+    if(data){
+      updateUserName()
+      loading.dismiss()
+    }
+
+  }
+
+  catch(error){
+  console.log(error)
+  toast.message = error.message 
+  await toast.present()
+  loading.dismiss()
+  }
+}
+
+
+
+async function updateUserName(){
+
+  toast = await toastController.create({ duration: 2500 })
+  loading = await loadingController.create({});
+
+  if(!name.value){
+      toast.message = "Maydon bo'sh qolishi mumkin emas"
+      await toast.present()
+      return
+    }
+
+  try {
+
+    const { data, error } = await supabase
+    .from('students')
+    .update({ display_name: name.value})
+    .eq('id', studentId.value)
+    .select()
+
+    if(error){
+      toast.message = error.message
+      await toast.present()
+      return
+    }
+
+    if(data){
+      toast.message = "Mufavaqqiyatli yangilandi"
+      await toast.present()
+    }
+
     
-   };
 
-
+  }
+  catch(error){
+    console.log(error)
+    toast.message = error.message 
+    await toast.present()
+  }
+  
+}
 </script>
 
 <template>
@@ -58,7 +142,6 @@ async function profileUpdate(){
 <ion-buttons>
 <ion-back-button default-href="/settings"></ion-back-button>
 </ion-buttons>
-<ion-title>Profilni tahrirlash</ion-title>
 </ion-toolbar>
 </ion-header>
 <ion-content scroll-y="false">
@@ -70,12 +153,12 @@ async function profileUpdate(){
 <ion-input label="Ismingiz" v-model="name"></ion-input>
 </ion-item>
 <ion-item>
-<ion-input label="Yangi parol" v-model="newPassword"></ion-input>
+<ion-input label="Yangi parol" placeholder="Yangi parol kiriting..." v-model="newPassword"></ion-input>
 </ion-item>
 <ion-item>
-<ion-input :readonly="true" label="Emailingiz" v-model="email"></ion-input>
+<ion-input readonly="true" label="Emailingiz" v-model="email"></ion-input>
 </ion-item>
-<ion-button shape="round" @click="profileUpdate" class="mx-auto ml-2 mt-4">Saqlash</ion-button>
+<ion-button shape="round" @click="updateUserEmailandPassword" class="mx-auto ml-2 mt-4">Saqlash</ion-button>
 </ion-list>
 </ion-col>
 </ion-row>
