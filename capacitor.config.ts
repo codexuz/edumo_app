@@ -7,6 +7,9 @@ const config: CapacitorConfig = {
   bundledWebRuntime: false,
   cordova: {},
   plugins: {
+    CapacitorCookies: {
+      enabled: true
+    },
     GoogleAuth: {
       scopes: ['profile', 'email'],
       serverClientId: '286062618284-cpte93ftno07vvadmfo3tr3617i1tj0j.apps.googleusercontent.com',
