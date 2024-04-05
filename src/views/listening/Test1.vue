@@ -52,12 +52,21 @@ onMounted(getListening)
     </ion-toolbar>
   </ion-header>
     <ion-content class="ion-padding">
-    <div class="container mx-auto px-4 grid grid-cols-2 sm:grid-cols-6">
-    <ion-card v-for="ques in list_test" :key="ques.id" class="bg-white shadow-xl rounded-xl">
-      <ion-card-header color="primary">
-        {{ ques.title }}
-      </ion-card-header>
-    </ion-card>
+    <div class="container mx-auto px-4" v-for="ques in list_test" :key="ques.id">
+    <audio controls :src="ques.audio"></audio>      
+     <h1>{{ ques.title }}</h1>
+     <button class="bg-blue-200/30 text-blue-500 px-5 py-[3px] rounded-xl text-sm mb-4">{{ ques.type }} - {{ ques.level }} </button>
+    <p v-html="ques.questions" class="mb-5 pb-5"></p>
+    <fwb-accordion :open-first-item="false" class="mb-9 mt-6">
+      <fwb-accordion-panel>
+        <fwb-accordion-header>Answers</fwb-accordion-header>
+        <fwb-accordion-content>
+          <div v-html="ques.answers">
+           
+          </div>
+        </fwb-accordion-content>
+      </fwb-accordion-panel>
+      </fwb-accordion>
     </div>
     </ion-content>
 </ion-page>

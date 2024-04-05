@@ -3,8 +3,6 @@ import App from './App.vue'
 import router from './router';
 import { IonicVue } from '@ionic/vue';
 import '../node_modules/flowbite-vue/dist/index.css'
-import { AVPlugin } from "vue-audio-visual";
-
 
 
 
@@ -79,7 +77,6 @@ import { use } from 'marked';
 const app = createApp(App)
   .use(IonicVue)
   .use(router)
-  .use(AVPlugin)
  
   
 

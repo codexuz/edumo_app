@@ -1,8 +1,30 @@
 <script setup>
-import { ref, watchEffect } from 'vue'
-import { supabase } from '@/lib/supabaseClient.js'
-import questions from '@/assets/questions.json'
-console.log(questions)
+import { ref, onMounted } from 'vue'
+import { supabase } from '@/supabase.js'
+
+const questions = ref('')
+
+async function fetchQuestions(){
+
+  try {
+
+    let { data, error } = await supabase
+  .from('speaking_tests')
+  .select(`*`)
+
+  if(data){
+    console.log(data)
+    questions.value = data
+  }
+
+  }
+  catch (error) {
+    console.log(error)
+  }
+}
+
+onMounted(fetchQuestions)
+
 </script>
 <template>
   <ion-page>
@@ -11,7 +33,7 @@ console.log(questions)
         <ion-buttons slot="start">
           <ion-back-button default-href="/home"></ion-back-button>
         </ion-buttons>
-       <ion-title class="ion-text-center">Speaking Tests</ion-title>
+       <ion-title class="ion-text-left">Speaking Tests</ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content scroll-y="true">
@@ -19,10 +41,10 @@ console.log(questions)
       <ion-row class="ion-align-items-center ion-justify-content-center">
         <ion-col size="12" size-lg="5" size-xl="4" size-md="6" v-for="(question, index) in questions" :key="index">
         <div>
-        <ion-card  class="bg-blue-600 rounded-xl">
+        <ion-card  class="bg-blue-600 rounded-3xl">
          <ion-card-header class="relative" :router-link="`mock-tests/${question.id}`">
-          <h3 class="text-xl text-white font-medium">{{ question.topic }}</h3>
-          <div class="absolute right-3 top-3 bg-white rounded-full px-5 py-1 text-blue-500">{{ question.title}}</div>
+          <h3 class="text-sm text-white font-medium">{{ question.topic }}</h3>
+          <div class="absolute right-3 top-3 bg-white rounded-full px-2.5 py-[1px] text-blue-500">{{ question.title}}</div>
          </ion-card-header>
         </ion-card>
       </div>

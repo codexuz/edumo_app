@@ -1,6 +1,6 @@
 <script setup>
 
-import { person, home, school, diamondOutline, statsChart, bookmarks } from 'ionicons/icons';
+import { personOutline, homeOutline, bookOutline, diamondOutline, podiumOutline, bookmarkOutline } from 'ionicons/icons';
 
 </script>
 
@@ -10,27 +10,27 @@ import { person, home, school, diamondOutline, statsChart, bookmarks } from 'ion
       <ion-router-outlet></ion-router-outlet>
       <ion-tab-bar slot="bottom">
         <ion-tab-button tab="home" href="/home">
-          <ion-icon :icon="home" />
+          <ion-icon :icon="homeOutline" />
           <ion-label>Asosiy</ion-label>
         </ion-tab-button>
 
         <ion-tab-button tab="courses" href="/courses">
-          <ion-icon :icon="school" />
+          <ion-icon :icon="bookOutline" />
           <ion-label>Kurslar</ion-label>
         </ion-tab-button>
 
         <ion-tab-button tab="result" href="/result">
-          <ion-icon :icon="statsChart" />
+          <ion-icon :icon="podiumOutline" />
           <ion-label>Natijalarim</ion-label>
         </ion-tab-button> 
         
         <ion-tab-button tab="universities" href="/universities">
-          <ion-icon :icon="bookmarks" />
-          <ion-label>OTMlar</ion-label>
+          <ion-icon :icon="bookmarkOutline" />
+          <ion-label>Saqlangan</ion-label>
         </ion-tab-button>
 
         <ion-tab-button tab="profile" href="/profile">
-          <ion-icon :icon="person" />
+          <ion-icon :icon="personOutline" />
           <ion-label>Profil</ion-label>
         </ion-tab-button>
       </ion-tab-bar>

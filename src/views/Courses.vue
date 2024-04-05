@@ -83,7 +83,7 @@ const router = useRouter();
   </ion-header>
   <ion-content scroll-y="true">
    <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-2">
-  <router-link v-for="course in courses" :to="`/course/${course.id}`" :key="course.id">
+  <div v-for="course in courses"  :key="course.id">
     <ion-card class="shadow-sm border border-gray-200/30 rounded-2xl">
     <ion-card-content>
       <div class="flex items-center gap-x-4">
@@ -104,7 +104,7 @@ const router = useRouter();
       </div>
     </ion-card-content>
     </ion-card>
-  </router-link>
+  </div>
    </div>
   </ion-content>
  </ion-page>

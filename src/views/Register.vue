@@ -4,10 +4,10 @@ import AuthIcon from '../assets/auth.svg'
 import {  loadingController, toastController } from '@ionic/vue';
 import { useRouter } from 'vue-router';
 import { supabase } from '@/supabase'
-import sms from '@/assets/sms.png'
-import Lock from '@/assets/Lock.png'
-import Logo from '@/assets/logo.png'
-import GoogleIcon from '@/assets/GoogleIcon.png'
+import sms from '@/assets/sms.svg'
+import Lock from '@/assets/lock.svg'
+import Logo from '@/assets/logo.svg'
+import User from '@/assets/user.svg'
 
 
 const router = useRouter()
@@ -39,7 +39,7 @@ const doRegister = async () => {
       options: {
       data: {
       full_name: name.value,
-      avatar_url: 'https://avatar.iran.liara.run/public/boy?username=Ash'
+      avatar_url: 'https://bkxhwaeluswfwfxavmpt.supabase.co/storage/v1/object/public/avatars/avatar.jpg'
           },
        },
     })
@@ -81,7 +81,7 @@ const doRegister = async () => {
         <img :src="Logo" class="sm:w-32 mx-auto" alt="Logo"/>
         <h1 class="font-bold text-2xl text-center mb-3">Welcome to SpeakUp!</h1>
       </div>
-      <form class="flex flex-col gap-2 mt-5"  @submit.prevent="doLogin">
+      <form class="flex flex-col gap-2 mt-5"  @submit.prevent="doRegister">
         <div class="flex items-center gap-x-3 border-2 border-[#2563EB] h-[48px] rounded-xl placeholder-[#2E2E2E] text-[#2E2E2E] px-3 font-medium">
           <img :src="User">
           <input type="text" required v-model="name" class="w-full border-none outline-none" placeholder="F.I.O"/>
@@ -101,10 +101,13 @@ const doRegister = async () => {
       </ion-col>
       </ion-row>
     </ion-grid>
-    <div class="w-full absolute bottom-10 flex items-center5 justify-center">
+  </ion-content>
+  <ion-footer class="ion-no-border">
+    <ion-toolbar color="light">
+      <div class="w-full flex items-center justify-center pb-10">
        <p class="text-[#515960]">Hisobingiz bormi? <span class="font-medium text-[#2563EB]"><router-link to="/login">Kirish</router-link></span></p>
     </div>
-   
-  </ion-content>
+    </ion-toolbar>
+  </ion-footer>
   </ion-page>
 </template>

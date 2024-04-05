@@ -1,140 +1,158 @@
 <script setup>
-import { ref, onMounted, watchEffect } from 'vue'
-import { Filesystem } from '@capacitor/filesystem';
-import { RouterLink, useRouter, RouterView } from 'vue-router'
+import { ref, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { networkService  } from '@/lib/networkService.js';
-import { walletOutline, calendarOutline, cardOutline,diamondOutline, logOutOutline, createOutline, settingsOutline, chevronBackOutline, chatboxEllipses, notificationsOutline, personCircle, shareSocialOutline, chatbubblesOutline, powerOutline } from 'ionicons/icons';
+import {  createOutline, calendarNumberOutline, settingsOutline } from 'ionicons/icons';
 import Avatar from '@/assets/avatar.jpg'
+import pen from '@/assets/pen.png'
+import Location from '@/assets/location.svg'
+import calendar from '@/assets/calendar.svg'
 import Authorize from '@/components/Authorize.vue'
 import { supabase } from '@/supabase'
 
-
-// Network Status
-networkService.getCurrentStatus().then(status => {
-  console.log('Current network status:', status);
-});
-
-
-const isOpen = ref(false);
-const setOpen = (open) => (isOpen.value = open)
-
 const router = useRouter();
 
-const LoggedIn = ref(null)
+const LoggedIn = ref(false)
+const loading = ref(true)
 const studentId = ref(null)
-
 const profile = ref({
-        full_name: 'O\'quvchi',
-        email: '',
-        avatar_url: Avatar,
-        joinedAt: ''
-    })
-      
-
-onMounted( async ()=>{
-  const { data, error } = await supabase.auth.getSession()
-  if(!data){
-    console.log('Tizimga kiring')
-    LoggedIn.value = false
-    return
-  }
-  studentId.value = data.session.user.id
-  getProfile()
+  full_name: 'O\'quvchi',
+  email: '',
+  avatar_url: Avatar,
+  joinedAt: ''
 })
 
+function getStoredProfile() {
+  const storedProfile = localStorage.getItem('profile');
+  if (storedProfile) {
+    return JSON.parse(storedProfile);
+  }
+  return null;
+}
+
+function storeProfileInStorage(profileData) {
+  localStorage.setItem('profile', JSON.stringify(profileData));
+}
+
+function clearStoredProfile() {
+  localStorage.removeItem('profile');
+}
+
+async function fetchData() {
+  try {
+    const { data, error } = await supabase.auth.getSession()
+    if (error) {
+      console.log('Tizimga kiring')
+      LoggedIn.value = false
+      loading.value = false
+      return
+    }
+    studentId.value = data.session.user.id
+    getProfile()
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+onMounted(async () => {
+  const isOnline = await networkService.getCurrentStatus();
+  if (!isOnline.connected) {
+    const storedProfile = getStoredProfile();
+    if (storedProfile) {
+      profile.value = storedProfile;
+      LoggedIn.value = true;
+      loading.value = false;
+    } else {
+      console.log('No stored profile data available.');
+      loading.value = false;
+    }
+  } else {
+    fetchData();
+  }
+});
+
+async function getProfile() {
+  try {
+    const { data, error } = await supabase
+      .from('students')
+      .select(`*`)
+      .eq('id', studentId.value)
+      .single()
+    if (error && status !== 406) throw error
+
+    if (data) {
+      LoggedIn.value = true;
+      loading.value = false;
+      const formattedProfile = {
+        full_name: data.display_name,
+        email: data.email,
+        avatar_url: data.avatar_url,
+        joinedAt: formatTimestamp(data.created_at)
+      };
+      storeProfileInStorage(formattedProfile);
+      profile.value = formattedProfile;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
 
 function formatTimestamp(timestamp) {
   const months = [
     "Yanvar", "Fevral", "Mart", "Aprel", "May", "İyun", 
     "İyul", "Avqust", "Sentyabr", "Oktyabr", "Noyabr", "Dekabr"
-  ]; // Azerbaijani month names
-
+  ];
   const date = new Date(timestamp);
   const month = months[date.getMonth()];
   const day = date.getDate();
   const year = date.getFullYear();
-    return `${month} ${day}, ${year}`;
-
+  return `${month} ${day}, ${year}`;
 }
 
-async function getProfile(){
-
-  try{
-
-    const { data, error } = await supabase
-            .from('students')
-            .select(`*`)
-            .eq('id', studentId.value)
-            .single()
-
-            if (error && status !== 406) throw error
-
-
-          if(data){
-         // console.log(data)
-          LoggedIn.value = true
-          profile.value = {
-          full_name: data.display_name,
-          email: data.email,
-          avatar_url: data.avatar_url,
-          joinedAt: formatTimestamp(data.created_at)
-          
-    }
-
+function goSettings() {
+  router.push('/settings', 'forward')
 }
 
-  }
-  catch(error){
-     
-  }
-
-}
-
-
-
-
-
-
-
-
-
-
-
+onUnmounted(() => {
+  clearStoredProfile();
+});
 </script>
 
 <template>
   <ion-page>
-  <ion-header class="ion-no-border">
-  <ion-toolbar color="primary" class="px-2">
-  <ion-title>Profil</ion-title>
-  <ion-button v-show="LoggedIn" router-link="/settings" router-direction="forward" slot="end" fill="clear">
-  <ion-icon color="light" :icon="settingsOutline"  size="large"></ion-icon>
-  </ion-button>
+  <ion-header class="ion-no-border ion-padding" v-show="LoggedIn">
+  <ion-toolbar color="light">
+    <div class="relative" slot="start">
+               <img :src="profile.avatar_url" class="w-[70px] h-[70px] rounded-full bg-gray-400 border-2 border-gray-300">
+               <img :src="pen" class="absolute right-[-8px] bottom-[15px] cursor-pointer">
+    </div>
+    <div slot="end">
+          <ion-icon :icon="settingsOutline" @click="goSettings" class="text-2xl"></ion-icon>
+    </div>
   </ion-toolbar>
-  </ion-header>
+  <div>
+            <h1 class="text-xl font-bold">{{ profile.full_name }}</h1>
+            <div class="flex items-start gap-x-2">
+              <img :src="Location" class="w-5 h-5"/>
+              <p class="text-[#515960]">Navoiy, Uzbekistan</p>
+            </div>
+            <div class="flex items-start gap-x-2">
+              <img :src="calendar" class="w-4 h-4"/>
+              <p  class="text-[#515960]"> {{ profile.joinedAt }} </p>
+            </div>
+        </div>
+</ion-header>
   <ion-content scroll-y="false">  
-  <template v-if="LoggedIn">   
-  <ion-grid>
-   <ion-row class="ion-align-items-center ion-justify-content-center">
-     <ion-col size="12" size-md="8" size-lg="6" size-xl="4" class="flex flex-col items-center  justify-center">
-       <img :src="profile.avatar_url" class="mb-3 mx-auto w-16 h-16 rounded-full border-2 border-blue-600">
-       <input id="upload" type="file" @change="handleFileChange" accept="image/*" hidden ref="fileInput">
-      <label class="px-5 py-1 rounded-2xl border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white text-lg font-medium" for="upload">
-      <ion-icon :icon="createOutline" slot="start"></ion-icon>
-      Rasmni o'zgartirish
-      </label>
-       <h1 class="text-3xl font-bold">{{ profile.full_name }}</h1>
-       <p>Qo'shilgan: {{ profile.joinedAt }} </p>
- 
+<div v-show="loading"  class="flex flex-col justify-center items-center">
+<Authorize/>
+</div>
+  <ion-grid v-show="!loading && LoggedIn">
+   <ion-row class="ion-align-items-center ion-justify-content-between">
+     <ion-col size="12" size-md="8" size-lg="6" size-xl="4" class="flex flex-col justify-start px-6">
+    <p class="font-bold text-xl">Kurslarim</p>
      </ion-col>
    </ion-row>
   </ion-grid>
-  </template>
-  <template v-else>
-<div  class="container mt-10 mx-auto px-4">
-<Authorize/>
-</div>
-</template>
 </ion-content>
  </ion-page>
  </template>

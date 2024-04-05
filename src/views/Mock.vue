@@ -1,152 +1,260 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
-import { volumeHigh } from 'ionicons/icons'
-import { TextToSpeech } from '@capacitor-community/text-to-speech';
+import { useRoute } from 'vue-router'
+import { supabase } from '@/supabase.js'
+import { startRecording, pauseRecording, stopRecording } from '@/microphone.js'
+import moment from 'moment'
 
 
+
+const hidden = ref(true)
+const mainPage = ref(false)
+const question = ref(null)
+const fontSize = ref(16)
+const countdown = ref('00:00');
+const currentQuestion = ref(0)
+const questionId = ref(null)
+const indicatorOne = ref(true)
+const indicatorTwo = ref(false)
+const indicatorThree = ref(false)
+
+
+const part1 = ref('')
+const part2 = ref('')
+const part3 = ref('')
 const route = useRoute();
-const testId = Number(route.params.id);
-import questions from '@/assets/questions.json'
-const question = ref(questions.find(question => question.id === testId) || {});
-const part1 = question.value.part1
-const part2 = question.value.part2
+const testId = route.params.id;
 
 
-const text = "What is your favourite meal?";
-const words = ref([]);
-const tarjima = ref('')
-const showTrBtn = ref(true)
-const isShown = ref(false)
+async function fetchQuestions(){
 
+  try {
 
-function setTrue(){
- isShown.value = true
+    let { data, error } = await supabase
+  .from('speaking_tests')
+  .select(`
+    *,
+    speaking_part1(
+      *
+    ),
+    speaking_part2(
+      *
+    ),
+    speaking_part3(
+      *
+    )
+  `)
+  .eq('id', testId)
+  .single()
+
+  if(data){
+    part1.value = data.speaking_part1
+    console.log(part1.value[currentQuestion.value].question)
+  }
+
+  }
+  catch (error) {
+    console.log(error)
+  }
 }
 
+onMounted(fetchQuestions)
 
-const speak = async (word) => {
-  await TextToSpeech.speak({
-    text: word,
-    lang: 'en-US',
-    rate: 1.0,
-    pitch: 1.0,
-    volume: 1.0,
-    category: 'ambient',
-  });
-
-  getDictionary(word)
-  
+// Function to transition UI
+const hideHome = () => {
+    hidden.value = false;
+    mainPage.value = true;
+    initializeFirstQuestion();
 };
 
 
-const speakSentence  = async () => {
-  await TextToSpeech.speak({
-    text: text,
-    lang: 'en-US',
-    rate: 1,
-    pitch: 1,
-    volume: 1.0,
-    category: 'ambient',
-    onend: () =>{
-      console.log('Hi')
+function sizeScale(){
+    fontSize.value ++
+}
+
+function sizeShrink(){
+    fontSize.value --
+}
+
+
+// Function to play audio for the current question
+const playQuestionAudio = () => {
+    const audio = new Audio(part1.value[currentQuestion.value].audio);
+    audio.play();
+    audio.onended = () => {
+        // Start countdown after question audio ends
+        startCountdown();
+    };
+};
+
+// Function to initialize the first question
+const initializeFirstQuestion = () => {
+    question.value = part1.value[currentQuestion.value].question;
+    questionId.value = part1.value[currentQuestion.value].id
+    playQuestionAudio();
+};
+
+
+// Function to start countdown for user response
+const startCountdown = () => {
+    let targetTime = moment().add(5, 'seconds');
+
+    const countdownInterval = setInterval(() => {
+        const currentTime = moment();
+        const secondsRemaining = targetTime.diff(currentTime, 'seconds');
+
+        const formattedTime = moment.utc(secondsRemaining * 1000).format('mm:ss');
+        countdown.value = formattedTime;
+
+        if (secondsRemaining <= 0) {
+            clearInterval(countdownInterval);
+            playBeep();
+        }
+    }, 1000);
+};
+
+// Function to play beep sound
+const playBeep = () => {
+    const beep = new Audio('/beep.m4a');
+    beep.play();
+    beep.onended = () => {
+        startRecording();
+        startRecordingCountdown();
+    };
+};
+
+
+// Function to advance to the next question
+const nextQuestion = () => {
+    if (currentQuestion.value < part1.value.length - 1) {
+        currentQuestion.value++;
+        question.value = part1.value[currentQuestion.value].question;
+        questionId.value = part1.value[currentQuestion.value].id;
+        playQuestionAudio();
+    } else {
+        indicatorTwo.value = true;
+        transitionPartTwo()
     }
-  });
 };
 
 
-onMounted(() => {
-  words.value = text.split(" ");
+
+// Function to start countdown for recording
+const startRecordingCountdown = () => {
+    let targetTime = moment().add(30, 'seconds');
+
+    const countdownInterval = setInterval(() => {
+        const currentTime = moment();
+        const secondsRemaining = targetTime.diff(currentTime, 'seconds');
+
+        const formattedTime = moment.utc(secondsRemaining * 1000).format('mm:ss');
+        countdown.value = formattedTime;
+
+        if (secondsRemaining <= 0) {
+            clearInterval(countdownInterval);
+            pauseRecording();
+            nextQuestion(); // Proceed to the next question
+        }
+    }, 1000);
+};
+
+
+//part2 Transtion
+
+function transitionPartTwo(){
+    question.value = ""
+    var audio = new Audio('https://examonline-rouge.vercel.app/mock-tests/test01/part2/intro.mp3')
+    questionId.value =""
+    audio.play()
+    audio.onended = ()=>{
+     speakingPart2()
+    }
+}
+
+
+function speakingPart2(){
+    questionId.value = 7
+    question.value = "Describe a piece of technology that you use a lot. You should say:\nWhat is it? \nWhat you use it for \nhow long you have been using it \nand say how you would feel without it"
+    const audio = new Audio('https://examonline-rouge.vercel.app/mock-tests/test01/part2/1.mp3');
+    audio.play();
+    audio.onended = () => {
+     startCountdown60();
+    };
+}
+
+window.addEventListener("popstate", (event) => {
+    console.log(
+    `location: ${document.location}, state: ${JSON.stringify(event.state)}`,
+  );
 });
-
-const stop = async () => {
-  await TextToSpeech.stop();
-};
-
-const URL = 'https://translate.yandex.net/api/v1.5/tr.json/translate'
-const Api ='trnsl.1.1.20230710T104110Z.008413911fef112b.b91a322675e3cfb27eb572260cda1d86909276ae'
-
-async function getTranslation(){
-  const res = await fetch(`${URL}?key=${Api}&text=${text}&lang=en-uz`)
-  const trans = await res.json()
-  console.log(trans.text)
-  tarjima.value = trans.text[0] 
-  showTrBtn.value = false
-}
-
-async function getDictionary(word){
-  const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`)
-  const data = await res.json()
-  console.log(data[0].phonetic)
-}
 
 </script>
 
 <template>
-  <ion-page>
-    <ion-header class="ion-no-border">
-      <ion-toolbar color="light" class="flex justify-between items-center">
-        <ion-buttons slot="start" class="bg-white shadow-sm rounded-xl text-gray-600">
-          <ion-back-button  default-href="/speaking"></ion-back-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
-    <ion-content scroll-y="false" class="ion-padding">
-     <ion-grid>
-       <ion-row>
-         <ion-col size="12" size-md="8" size-lg="6" size-xl="4" class="mx-auto flex flex-col items-center justify-center">
-
-          <div class="m-0 flex flex-col items-center">
-            <progress  class="mx-auto mb-4 progress progress-primary w-56" value="60" max="100"></progress>
-             <h1>What’s the meaning of this sentence?</h1>
-            <div class="flex items-center">
-              <button class="btn btn-primary mx-3" @click="speakSentence"> 
-              <ion-icon class="cursor-pointer text-white text-xl rounded-lg" :icon="volumeHigh" ></ion-icon>
+  <ion-page >
+  <ion-header class="ion-no-border">
+  <ion-toolbar color="primary">
+  <ion-title>Test 1</ion-title>
+  </ion-toolbar>
+  </ion-header>
+  <ion-content  scroll-y="false">
+  <section v-show="hidden">
+      <main class="py-5 text-center flex flex-col justify-start items-center">
+      <div class="text-lg text-gray-800 my-3 container mx-auto px-4">
+      <p>Gapirish bo'limi <b>3 ta qismdan</b> iborat:</p>
+      <ul>
+          <li>Part 1: 6 ta savol</li>
+          <li>Part 2: Maxsus savol (davomiyligi: 2 daqiqa)</li>
+          <li>Part 3: 5 ta savol (Part 2 ga oid savollar)</li>
+        </ul>
+      
+      <p class="text-red-600">Ushbu bo'limda oldingi savolga yoki oldingi qismga qaytishning imkoni yo'q.<br>Mikrofon avtomatik ravishda yoqiladi va o'chiriladi.</p>
+      
+      <p><u>Savol uchun ajratilgan vaqt tugagach, keyingi savol avtomatik tarzda ochiladi.</u></p>
+      </div>
+      
+      <button @click="hideHome" class="bg-emerald-500 rounded  text-gray-800 font-semibold text-xl px-8 my-2 py-2 shadow-lg"> ⚠️ Imtihonni boshlash</button>
+      
+      </main>
+  </section>
+  <section v-show="mainPage">
+  <div class="flex text-center mt-6 items-center justify-center text-white">
+      <div class="rounded py-1 px-5 flex items-center justify-center shadow-lg mx-2" :class="{active: indicatorOne}">Part 1</div> 
+      <div  class="rounded py-1 px-5 bg-blue-500 flex items-center justify-center shadow-lg mx-2" :class="{active: indicatorTwo}">Part 2</div> 
+      <div class="rounded py-1 px-5  bg-blue-500 flex items-center justify-center  shadow-lg mx-2" :class="{active: indicatorThree}">Part 3</div> 
+  </div>
+  
+  <main class="main container mx-auto px-4  mb-4 py-6 shadow-xl rounded justify-between items-start">
+      <div class="right-side bg-gray-100 rounded-lg p-6 my-4">
+        <div class="flex justify-bewteen items-center">
+          <button class="bg-blue-600 text-white rounded-xl py-2 font-bold px-4 w-full">Question# {{ questionId }}<span id="q-number"></span></button>
+        </div>
+        <div class="my-3 border-b border-gray-300"></div>
+        <div class="flex justify-center items-center text-white font-bold">
+          <button class="bg-blue-600 py-2 px-3 rounded-lg text-center mx-3" @click="sizeShrink">A-</button>
+          <button  class="bg-blue-600 py-2 px-3 rounded-lg text-center mx-3" @click="sizeScale">A+</button> 
+        </div>
+        <div class="my-3 border-b border-gray-300"></div>
+        <p class="text-gray-800 text-center" :style="{ 'font-size': fontSize+'px'}">{{ question }}</p>
+      </div>
+      <!----Left side-->
+      <div class="left-side bg-gray-100 rounded-lg p-6 ">
+          <button class="w-full rounded py-2 text-gray-800 text-xl bg-gray-300" id="timer" style="font-family:monospace;">{{ countdown }}</button>
+          <div class="hidden w-full my-3 bg-gray-600 p-4 rounded flex justify-center items-center" id="recorder-blink">
+              <button class="px-5 py-3 rounded-lg bg-gray-700">
+                  <div class="recording w-6 h-6 rounded-full bg-red-600 border shadow-lg border-red-700"></div>
               </button>
-
-          <span  v-for="(word, index) in words" :key="index" @click="speak(word)">
-            <p class="hover:underline decoration-dotted cursor-pointer decoration-2 decoration-blue-500">{{ word }}&nbsp;</p> 
-          </span>
-        </div>
-          <span v-show="showTrBtn" class="text-gray-500 cursor-pointer" @click="getTranslation()"><small>Tarjimasini ko'rish</small></span>
-          <span v-show="!showTrBtn" class="text-blue-500"><small>{{ tarjima }}</small></span>
-        </div>
-
-        <textarea  class="w-[80%] resize-none sm:w-[260px] mt-5 mb-2 px-5 py-2 mx-auto bg-[#F7F7F7] border border-[#C5BFBF] rounded-xl outline-none h-[150px] overflow-hidden text-gray-700">
-
-        </textarea>
-
-         </ion-col>
-       </ion-row>
-     </ion-grid> 
-    </ion-content>
-    <ion-footer class="ion-no-border">
-    <ion-toolbar color="light">
-      <div v-show="isShown" class="w-full flex flex-col justify-center items-start px-5  py-3 bg-rose-300/30 sm:w-[400px] mx-auto rounded-t-xl">
-        <div class="mx-3">
-          <h3 class="text-rose-600 text-2xl">Xato!</h3>
-          <p class="text-rose-600 text-sm font-bold mb-3">
-            To'g'ri javob: 
-          </p>
-          <p class="text-rose-600 text-sm mb-3">
-            Permisi, nama saya Asep 
-          </p>
-        </div>
-        <button class=" w-[80%] sm:w-[300px] mx-auto px-8 text-xl text-white btn btn-error  rounded-2xl">Davom etish</button>
+          </div>
       </div>
-      <div v-show="false" class="w-full flex flex-col justify-center items-start px-5  py-3 bg-emerald-300/30 sm:w-[400px] mx-auto rounded-t-xl">
-        <div class="mx-3">
-          <h3 class="text-emerald-600 text-2xl">To'g'ri!</h3>
-        </div>
-        <button class=" w-[80%] sm:w-[300px] mx-auto px-8 text-xl text-white btn btn-accent  rounded-2xl">Davom etish</button>
-      </div>
-       <div v-show="!isShown" class="flex flex-col justify-center items-center mb-3">
-        <button @click="setTrue" class="w-[80%] sm:w-[300px] mx-auto px-8 text-xl text-white btn btn-primary rounded-2xl">
-         Tekshirish
-        </button>
-      </div>
-    </ion-toolbar>
-  </ion-footer>
+  
+  </main>
+  </section>
+  </ion-content>
   </ion-page>
-</template>
-
+  </template>
+  
+  <style scoped>
+      .active{
+          background-color: #0fd464;
+      }
+  </style>

@@ -151,9 +151,9 @@ const calculateProgress = () => {
            </div> 
       </ion-toolbar>
     </ion-header>
-    <div v-show="isLoading" class="text-center">Yuklanmoqda...</div>
-    <ion-content v-show="!isLoading" scroll-y="auto" class="ion-padding">
-     <ion-grid>
+    <ion-content  scroll-y="auto" class="ion-padding">
+      <div v-show="isLoading" class="text-center">Yuklanmoqda...</div>
+     <ion-grid v-show="!isLoading">
        <ion-row>
 
          <ion-col size="12" size-md="8" size-lg="6" size-xl="4" class="mx-auto flex flex-col items-center justify-center">

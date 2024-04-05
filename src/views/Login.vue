@@ -1,13 +1,22 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import sms from '@/assets/sms.png'
-import Lock from '@/assets/Lock.png'
-import Logo from '@/assets/logo.png'
-import GoogleIcon from '@/assets/GoogleIcon.png'
+import sms from '@/assets/sms.svg'
+import Lock from '@/assets/lock.svg'
+import Logo from '@/assets/logo.svg'
+import GoogleIcon from '@/assets/google.svg'
 import {  loadingController, toastController } from '@ionic/vue';
 import { useRouter } from 'vue-router';
 import { supabase } from '@/supabase'
 import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
+import { networkService } from '@/lib/networkService.js';
+
+const networkStatus = ref(null)
+
+const checkOfflineStatus = async () => {
+  const isOnline = await networkService.getCurrentStatus();
+  networkStatus.value = isOnline;
+  return isOnline;
+}
 
 onMounted(() => {
   GoogleAuth.initialize();
@@ -45,18 +54,14 @@ const togglePasswordVisibility = () => {
 
 
 const getUser = async () => {
-  const { data, error } = await supabase.auth.getSession()
-  if(!error){
-    console.log('Tizimga kiring')
-    return
+  const userLoggedIn = localStorage.getItem('isLoggedIn')
+  
+  if(!userLoggedIn){
+    console.log('You are not sign it')
   }
   
-  if(data){
-    console.log(data)
+  console.log(userLoggedIn)
     router.push('/home', 'forward')
-  }
-  
-  
   
 }
 
@@ -64,9 +69,18 @@ onMounted(getUser)
 
 //Login
   const  doLogin = async () => {
-
-        const toast = await toastController.create({ duration: 2500 })
+       
+        const toast = await toastController.create({ duration: 5000, position: 'top', class: 'custom-toast' })
         const loading = await loadingController.create({});
+
+        const isOnline = await checkOfflineStatus();
+        if (!isOnline.connected) {
+           toast.message = "Internetga ulanmagansiz"
+           await toast.present()
+           return
+        }
+
+        
 
       if (!email.value || !password.value) {
         toast.message = 'Barcha maydonlar to\'ldirilishi shart!'
@@ -86,6 +100,7 @@ onMounted(getUser)
           if (error) throw error
          
           if(data){
+            localStorage.setItem('isLoggedIn', true)
             router.push('/home', 'forward')
           }
 
@@ -110,9 +125,6 @@ onMounted(getUser)
   <ion-page>
     <ion-header class="ion-no-border">
       <ion-toolbar color="light">
-       <ion-buttons slot="start">
-        <ion-back-button default-href="/home"></ion-back-button>
-        </ion-buttons>
       </ion-toolbar>
     </ion-header>
     <ion-content class="ion-padding ion-margin-top" scroll-y="false">
@@ -135,7 +147,7 @@ onMounted(getUser)
        <div class="flex flex-col items-center">
           <button class="py-3 rounded-xl bg-[#2563EB] px-4 text-white w-full">Kirish</button>
        </div>
-      <p class="text-gray-700 text-center mt-6"><b>Parolni unutdingizmi?</b> <span class="text-[#2563EB]text-sm"><router-link to="#">Parolni tiklash</router-link></span></p>
+      <p class="text-gray-700 text-center mt-6"><b>Parolni unutdingizmi?</b> <span class="text-[#2563EB]text-sm"><router-link to="/forgot-password">Parolni tiklash</router-link></span></p>
       <div class="flex items-center gap-x-2 mt-1">
         <div class="border-b border-[#F3F3F5] w-full"></div><span class="text-[#BEC1C4]">YOKI</span><div class="border-b border-[#F3F3F5] w-full"></div>
       </div>
@@ -148,11 +160,23 @@ onMounted(getUser)
        </div>
       </ion-col>
       </ion-row>
-    </ion-grid>
-    <div class="w-full absolute bottom-10 flex items-center5 justify-center">
-       <p class="text-[#515960]">Hisobingiz yo'qmi? <span class="font-medium text-[#2563EB]"><router-link to="/register">Ro'yxatdan o'tish</router-link></span></p>
-    </div>
-   
+    </ion-grid> 
   </ion-content>
+  <ion-footer class="ion-no-border">
+    <ion-toolbar color="light">
+      <div class="w-full flex items-center justify-center pb-10">
+        <p class="text-[#515960]">Hisobingiz yo'qmi? <span class="font-medium text-[#2563EB]"><router-link to="/register">Ro'yxatdan o'tish</router-link></span></p>
+    </div>
+    </ion-toolbar>
+  </ion-footer>
   </ion-page>
 </template>
+
+<style scoped>
+  ion-toast.custom-toast {
+    --background: #fa0c0456;
+    --box-shadow: 3px 3px 10px 0 rgba(240, 240, 240, 0.2);
+    --color: #f70000;
+  }
+
+</style>
