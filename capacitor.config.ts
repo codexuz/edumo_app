@@ -1,7 +1,7 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: "uz.edumo.academy",
+  appId: "uz.speakup.academy",
   appName: "Edumo Academy",
   webDir: "dist",
   bundledWebRuntime: false,
