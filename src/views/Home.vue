@@ -7,7 +7,9 @@ import Offline from '@/components/Offline.vue'
 import Avatar from '@/assets/avatar.jpg'
 import MemberCard from '@/components/MemberCard.vue'
 import Features from '@/components/Features.vue'
-import { supabase } from '@/supabase'
+import { supabase, trackUserActivityStart } from '@/supabase'
+import { Filesystem, Directory } from '@capacitor/filesystem';
+
 
 const networkStatus = ref(null)
 const studentId = ref(null)
@@ -47,12 +49,34 @@ async function getProfile() {
         email: data.email,
         avatar_url: data.avatar_url,
       }
+
+      // Cache the profile image locally
+      await cacheProfileImage(data.avatar_url);
     }
 
   } catch (error) {
     console.error(error);
   }
 }
+
+// Function to cache profile image locally
+async function cacheProfileImage(avatarUrl) {
+  try {
+    const { uri } = await Filesystem.downloadFile({
+      url: avatarUrl,
+      directory: Directory.Data,
+      path: 'profile/avatar.jpg',
+      recursive:true
+    });
+    // Update profile avatar URL with the local file URI
+    profile.value.avatar_url = uri;
+  } catch (error) {
+    console.error('Error caching profile image:', error);
+  }
+}
+
+
+
 
 // On mounted, check if online, then get profile data
 onMounted(async () => {
@@ -82,6 +106,9 @@ function getStoredProfile() {
   const storedProfile = localStorage.getItem('profile');
   return storedProfile ? JSON.parse(storedProfile) : null;
 }
+
+
+
 </script>
 
 <template>

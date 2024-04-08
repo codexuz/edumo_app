@@ -76,7 +76,7 @@ const sendChecking = async () => {
   console.log(question)
 
   const options = {
-    url: 'https://generate-production.up.railway.app/generate',
+    url: 'https://generate.edumoacademy.uz/generate',
     headers: {  
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*'

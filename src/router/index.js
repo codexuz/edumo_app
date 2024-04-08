@@ -1,8 +1,6 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import Tabs from '@/components/Tabs.vue';
 import { supabase } from '@/supabase';
-import { networkService } from '@/lib/networkService.js';
-const isOnline = await networkService.getCurrentStatus();
 
 
 const routes = [
@@ -34,7 +32,7 @@ const routes = [
     component: ()=> import('@/views/words_game/Learn.vue')
   },
   {
-    path: '/listening:id',
+    path: '/listening/:id',
     component: ()=> import('@/views/listening/Test.vue')
   },
   {
@@ -62,10 +60,6 @@ const routes = [
     component: ()=> import('@/views/ForgotPassword.vue'),
     meta: { requiresAuth: false }
  },
-  {
-    path: '/chat',
-    component: () => import('@/views/Chat.vue'),
-  },
   {
     path: '/',
     redirect: '/home',
@@ -114,8 +108,7 @@ const router = createRouter({
 })
 
 router.beforeEach( async(to, from, next) => {
-  const isLoggedIn = JSON.parse(localStorage.getItem('isLoggedIn'));
-  const isSignedIn = await supabase.auth.getSession() 
+  const isLoggedIn = JSON.parse(localStorage.getItem('sb-bkxhwaeluswfwfxavmpt-auth-token'));
  // console.log(isSignedIn.data.session.user)
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
 

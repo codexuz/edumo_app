@@ -6,9 +6,10 @@ import Logo from '@/assets/logo.svg'
 import GoogleIcon from '@/assets/google.svg'
 import {  loadingController, toastController } from '@ionic/vue';
 import { useRouter } from 'vue-router';
-import { supabase } from '@/supabase'
+import { supabase, trackUserActivityStart } from '@/supabase'
 import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
 import { networkService } from '@/lib/networkService.js';
+import { eyeOutline, eyeOffOutline } from 'ionicons/icons'
 
 const networkStatus = ref(null)
 
@@ -39,7 +40,11 @@ async function googleAuth() {
 
   if(data){
     console.log(data)
-    router.push('home', 'forward')
+    const isLoggedIn = JSON.parse(localStorage.getItem('sb-bkxhwaeluswfwfxavmpt-auth-token'));
+    if(isLoggedIn){
+      router.push('home', 'forward')
+    }
+    
   }
   }
 
@@ -54,14 +59,14 @@ const togglePasswordVisibility = () => {
 
 
 const getUser = async () => {
-  const userLoggedIn = localStorage.getItem('isLoggedIn')
+  const userLoggedIn = JSON.parse(localStorage.getItem('sb-bkxhwaeluswfwfxavmpt-auth-token'))
   
   if(!userLoggedIn){
     console.log('You are not sign it')
   }
   
-  console.log(userLoggedIn)
-    router.push('/home', 'forward')
+  //console.log(userLoggedIn)
+   router.push('/home', 'forward')
   
 }
 
@@ -100,7 +105,9 @@ onMounted(getUser)
           if (error) throw error
          
           if(data){
+            //console.log(data.user.id)
             localStorage.setItem('isLoggedIn', true)
+            const res = await trackUserActivityStart(data.user.id, 'Login')
             router.push('/home', 'forward')
           }
 
@@ -142,7 +149,8 @@ onMounted(getUser)
        </div>
        <div class="flex items-center gap-x-3 border-2 border-[#2563EB] h-[48px] rounded-xl placeholder-[#2E2E2E] text-[#2E2E2E] px-3 font-medium">
           <img :src="Lock">
-          <input type="password" required v-model="password" class="w-full border-none outline-none" placeholder="Parol" autocomplete="true">
+          <input :type="showPassword ? 'text' : 'password'"  required v-model="password" class="w-full border-none outline-none" placeholder="Parol" autocomplete="true">
+          <ion-icon class="text-2xl" @click="togglePasswordVisibility" :icon="showPassword ? eyeOffOutline :  eyeOutline"></ion-icon>
        </div>
        <div class="flex flex-col items-center">
           <button class="py-3 rounded-xl bg-[#2563EB] px-4 text-white w-full">Kirish</button>

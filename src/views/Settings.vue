@@ -3,7 +3,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { personCircle, shareSocialOutline, chatbubblesOutline, powerOutline } from 'ionicons/icons';
 import { RouterLink, useRouter, RouterView } from 'vue-router'
 import { Share } from '@capacitor/share';
-import { supabase } from '@/supabase'
+import { supabase, endUserActivity } from '@/supabase'
 import { toastController, loadingController } from '@ionic/vue';
 import { Dialog } from '@capacitor/dialog';
 import User from '@/assets/user.svg'
@@ -103,8 +103,9 @@ const confirmExit = async () => {
     if (!value) {
         return
     }
-
-    logOutUser()
+    
+    await logOutUser()
+    await endUserActivity(studentId.value, 'Login')
 };
 
 
@@ -119,7 +120,7 @@ const logOutUser = async () => {
             return
         }
         localStorage.clear('isLoggedIn')
-        window.location.href = '/login'
+        router.push('/login', 'back')
     } catch (error) {
         toast.message = error.error_description || error.message
         await toast.present()
@@ -131,7 +132,7 @@ async function shareApp() {
         await Share.share({
             title: 'ExamOnline Edumo',
             text: 'Multilevel imtihoniga tayyorlanuvchilar uchun ilova',
-            url: 'https://play.google.com/store/apps/details?id=vercel.multiexam.app&hl=en&gl=US',
+            url: 'https://play.google.com/store/apps/details?id=uz.speakup.academy',
             dialogTitle: 'Do\'stlaringiz bilan ulashing',
         });
     } catch (error) {
