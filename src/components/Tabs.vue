@@ -1,7 +1,9 @@
 <script setup>
 
 import { personOutline, homeOutline, bookOutline, diamondOutline, podiumOutline, bookmarkOutline } from 'ionicons/icons';
-
+import SolarGraphNewBroken from '@/components/icons/Graph.vue';
+import HomeIcon from './icons/HomeIcon.vue';
+import BookMark from './icons/BookMark.vue';
 </script>
 
 <template>
@@ -10,7 +12,7 @@ import { personOutline, homeOutline, bookOutline, diamondOutline, podiumOutline,
       <ion-router-outlet></ion-router-outlet>
       <ion-tab-bar slot="bottom">
         <ion-tab-button tab="home" href="/home">
-          <ion-icon :icon="homeOutline" />
+          <HomeIcon/>
           <ion-label>Asosiy</ion-label>
         </ion-tab-button>
 
@@ -20,12 +22,12 @@ import { personOutline, homeOutline, bookOutline, diamondOutline, podiumOutline,
         </ion-tab-button>
 
         <ion-tab-button tab="result" href="/result">
-          <ion-icon :icon="podiumOutline" />
+          <SolarGraphNewBroken/>
           <ion-label>Natijalarim</ion-label>
         </ion-tab-button> 
         
         <ion-tab-button tab="universities" href="/universities">
-          <ion-icon :icon="bookmarkOutline" />
+          <BookMark/>
           <ion-label>Saqlangan</ion-label>
         </ion-tab-button>
 
